@@ -1,11 +1,13 @@
 <?php namespace GeneaLabs\LaravelModelCaching\Traits;
 
 use GeneaLabs\LaravelModelCaching\CachedBelongsToMany;
+use GeneaLabs\LaravelModelCaching\CachedMorphToMany;
 use GeneaLabs\LaravelModelCaching\CachedBuilder;
 use GeneaLabs\LaravelModelCaching\EloquentBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Carbon;
 
 trait ModelCaching
@@ -151,6 +153,49 @@ trait ModelCaching
             $parentKey,
             $relatedKey,
             $relationName
+        );
+    }
+
+    protected function newMorphToMany(
+        Builder $query,
+        Model $parent,
+        string $name,
+        string $table,
+        string $foreignPivotKey,
+        string $relatedPivotKey,
+        string $parentKey,
+        string $relatedKey,
+        string $relationName = null,
+        bool $inverse = false
+    ) {
+        if (method_exists($query->getModel(), "isCachable")
+            && $query->getModel()->isCachable()
+        ) {
+            return new CachedMorphToMany(
+                $query,
+                $parent,
+                $name,
+                $table,
+                $foreignPivotKey,
+                $relatedPivotKey,
+                $parentKey,
+                $relatedKey,
+                $relationName,
+                $inverse
+            );
+        }
+
+        return new MorphToMany(
+            $query,
+            $parent,
+            $name,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey,
+            $relatedKey,
+            $relationName,
+            $inverse
         );
     }
 
